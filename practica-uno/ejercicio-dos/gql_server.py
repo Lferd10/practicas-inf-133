@@ -38,16 +38,24 @@ class Planta(ObjectType):
 
 class Query(ObjectType):
     plantas = List(Planta)
-    planta_id = Field(Planta, id=Int())
+    planta_especie = Field(Planta, especie=String())
+    plantas_frutos = List(Planta)
     
     def resolve_plantas(root, info):
         return plantas
     
-    def resolve_planta_id(root, info, id):
-        for planta_id in plantas:
-            if planta_id.id == id:
-                return planta_id
+    def resolve_planta_especie(root, info, especie):
+        for planta_especie in plantas:
+            if planta_especie.especie == especie:
+                return planta_especie
         return None
+
+    def resolve_plantas_frutos(root, info):
+        for plantas_frutos in plantas:
+            if plantas_frutos.frutos == True:
+                plantas_fruta.append(plantas_frutos)
+        return plantas_fruta
+
 
 class CrearPlanta(Mutation):
     class Arguments:
@@ -86,16 +94,42 @@ class DeletePlanta(Mutation):
                 return DeletePlanta(planta=planta)
         return None
 
+class ActualizarPlanta(Mutation):
+    class Arguments:
+        id = Int()
+        nombre = String()
+        especie = String()
+        edad = String()
+        altura = Float()
+        frutos = Boolean()
+
+    planta = Field(Planta)
+
+    def mutate(root, info, id, nombre, especie, edad, altura, frutos):
+        for i, planta in enumerate(plantas):
+            if planta.id == id:
+                planta.nombre = nombre
+                planta.especie = especie
+                planta.edad = edad
+                planta.altura = altura
+                planta.frutos = frutos
+                return ActualizarPlanta(planta=planta)
+        return None
+
 
 
 class Mutations(ObjectType):
     crear_planta = CrearPlanta.Field()
     delete_planta = DeletePlanta.Field()
+    actualizar_planta = ActualizarPlanta.Field()
 
 
 plantas = [
     Planta(id=1, nombre="Pino", especie="Arbol", edad="18 meses", altura=325.55, frutos=False),
-    Planta(id=2, nombre="Laurel", especie="Hierba", edad="2 meses", altura=15.30, frutos=False)
+    Planta(id=2, nombre="Laurel", especie="Hierba", edad="2 meses", altura=15.30, frutos=False),
+    Planta(id=3, nombre="Cerezos", especie="Arbol", edad="16 meses", altura=210.30, frutos=True)
+]
+plantas_fruta = [
 ]
 
 schema = Schema(query=Query, mutation=Mutations)
